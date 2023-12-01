@@ -1,6 +1,5 @@
 import re
 
-
 func1 = lambda a: sum(int("".join(re.findall(r'\d', i))) for i in a)
 
 
@@ -42,8 +41,9 @@ test_functions = lambda a: print(f"func1: {func1(a)}"
                                  f"\nfunc2: {func2(a)}"
                                  f"\nhelping_elves: {helping_elves(a)}")
 
-
-test_functions([
-    "a1b2",
-    "c3d4"
-])
+test_functions(
+    [
+        "a1b2",
+        "c3d4"
+    ]
+)
