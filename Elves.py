@@ -3,7 +3,7 @@ import re
 func1 = lambda a: sum(int("".join(re.findall(r'\d', i))) for i in a)
 
 
-def func2(strings: []):
+def func2(strings: list):
     result = 0
     for i in strings:
         result += int("".join(re.findall(r'\d', i)))
