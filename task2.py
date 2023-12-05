@@ -1,1 +1,0 @@
-func = lambda a,b,h: print("Недосып") if h < a else print("Пересып") if h > b else print("Нормально")
