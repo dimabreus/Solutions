@@ -37,9 +37,37 @@ def helping_elves(strings: list[str]) -> int:
     return int(finally_result)
 
 
+def helping_elves_another(strings: list[str]) -> int:
+    """
+    Принимает массив строк с числами;\n
+    Возвращает сумму чисел из строк.\n
+    helping_elves(["a1b2"]) #12\n
+    helping_elves(["a1b2", "c3d4"]) #46
+    """
+
+    for string in strings:
+        if not isinstance(string, str):
+            return 0
+
+    finally_result = 0
+
+    for string in strings:
+        numbers_in_stroke = ""
+
+        for letter in string:
+            if letter in "0123456789":
+                numbers_in_stroke += letter
+
+        if numbers_in_stroke != "":
+            finally_result += int(numbers_in_stroke)
+
+    return int(finally_result)
+
+
 test_functions = lambda a: print(f"func1: {func1(a)}"
                                  f"\nfunc2: {func2(a)}"
-                                 f"\nhelping_elves: {helping_elves(a)}")
+                                 f"\nhelping_elves: {helping_elves(a)}"
+                                 f"\nhelping_elves_another: {helping_elves_another(a)}")
 
 test_functions(
     [
