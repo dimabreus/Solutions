@@ -19,7 +19,7 @@ def save(url):
 
     print(r.status_code)
 
-    # open(filename, "wb").write(r.content)
+    open(filename, "wb").write(r.content)
     # img = Image.open(filename)
     # img.show()
     # os.remove(filename)
@@ -41,7 +41,7 @@ link = "https://raw.githubusercontent.com/dimabreus/link/main/images/discord.svg
 link_rep = "https://github.com/torvalds/linux.git"
 
 
-save("https://http.cat/404")
+save("https://http.cat/200")
 
 def save_many(a: list[list[int, int]]):
     for i in a:
