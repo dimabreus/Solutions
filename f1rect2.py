@@ -1,4 +1,5 @@
-import threading
+import random
+from protime import setInterval, clearInterval
 
 from pygame import *
 
@@ -29,6 +30,7 @@ car_y = screen_height / 2
 car = Rect(car_x, car_y, 100, 50)
 
 score = 0
+life = 3
 
 exit_game = False
 
@@ -36,29 +38,23 @@ rectangles = [Rect(0, screen_height / 2, 50, 25), Rect(100, screen_height / 2, 5
               Rect(200, screen_height / 2, 50, 25), Rect(300, screen_height / 2, 50, 25),
               Rect(400, screen_height / 2, 50, 25)]
 
-t = False
+let_x = screen_width
+let_y = random.randint(0, screen_height - 50)
+let = Rect(let_x, let_y, 50, 50)
 
 
-def interval(close: bool = False):
-    global t
+def score_plus():
     global score
-
-    if close:
-        t.cancel()
-        return
-
     score += 1
-    t = threading.Timer(1, interval)
-
-    t.start()
 
 
-interval()
+interval = setInterval(score_plus, 1)
+
 while not exit_game:
     for e in event.get():
         if e.type == QUIT:
             exit_game = True
-            interval(True)
+            clearInterval(interval)
 
         if e.type == KEYDOWN:
             if e.key == K_w:
@@ -67,8 +63,6 @@ while not exit_game:
             elif e.key == K_s:
                 if car_y + 100 <= screen_height:
                     car_y += 50
-
-        # snake = Rect(snake_x, snake_y, 50, 50)
 
     canvas.fill(BLACK)
 
@@ -79,11 +73,32 @@ while not exit_game:
             i.left = 500
         draw.rect(canvas, WHITE, i)
 
+    if let.left - 1 >= 0:
+        let.left -= 1
+    else:
+        let_y = random.randint(0, screen_height - 50)
+        let = Rect(let_x, let_y, 50, 50)
+        let.left = 500
+
+    if let.left < car.right and let.right > car.left:  # Проверка по X
+        if let.bottom > car.top and let.top < car.bottom:  # Проверка по Y
+            if life > 0:
+                life -= 1
+            else:
+                quit()
+            let_y = random.randint(0, screen_height - 50)
+            let = Rect(let_x, let_y, 50, 50)
+            let.left = 500
+
     car = Rect(car_x, car_y, 100, 50)
     draw.rect(canvas, RED, car)
+    draw.rect(canvas, GREEN, let)
 
     scoreLabel = font.render(str(score), 1, WHITE)
+    lifeLabel = font.render(str(life), 1, YELLOW)
+
     canvas.blit(scoreLabel, (0, 0))
+    canvas.blit(lifeLabel, (100, 0))
 
     display.update()
     clock.tick(fps)
