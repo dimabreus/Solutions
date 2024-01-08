@@ -1,6 +1,6 @@
 import random
-from protime import setInterval, clearInterval
 
+from protime import setInterval, clearInterval
 from pygame import *
 
 init()
@@ -49,8 +49,10 @@ def score_plus():
 
 
 interval = setInterval(score_plus, 1)
+direction = "stop"
 
 while not exit_game:
+
     for e in event.get():
         if e.type == QUIT:
             exit_game = True
@@ -58,11 +60,20 @@ while not exit_game:
 
         if e.type == KEYDOWN:
             if e.key == K_w:
-                if car_y - 50 >= 0:
-                    car_y -= 50
+                direction = "up"
             elif e.key == K_s:
-                if car_y + 100 <= screen_height:
-                    car_y += 50
+                direction = "down"
+        elif e.type == KEYUP:
+            direction = "stop"
+
+        if e.type == MOUSEBUTTONDOWN:
+            if e.button == 4:
+                print(e.pos)
+
+    if direction == "up" and car_y - 3 >= 0:
+        car_y -= 3
+    elif direction == "down" and car_y + 53 <= screen_height:
+        car_y += 3
 
     canvas.fill(BLACK)
 
