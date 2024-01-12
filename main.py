@@ -76,11 +76,13 @@ while True:
         index_of_el = False
 
         if el.isdigit():
+        # try:
             el = int(el)
 
             if check_el_in_list(el, lines):
                 index_of_el = el
         else:
+        # except ValueError:
             for i, line in enumerate(lines):
                 if line == el or line[:-1] == el:
                     index_of_el = i
@@ -131,7 +133,7 @@ while True:
 ┃┣┳┳━━┫┣━━┳╭╯
 """)
         answers = {"да": True, "нет": False}
-        confirm = input("Вы уверены (да, нет)")
+        confirm = input("Вы уверены (да, нет): ")
 
         if confirm in answers:
             confirm = answers[confirm]
@@ -139,4 +141,12 @@ while True:
             print("Выбран неправильный ответ")
             continue
 
-        write_file("")
+        if confirm:
+            if input("Введите пароль: ") == "7856":
+                print("Неееет, прощай бд")
+                write_file("")
+                break
+            else:
+                print("Ошибка................")
+        else:
+            print("Ну ладно")
