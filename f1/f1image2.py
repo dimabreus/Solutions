@@ -140,11 +140,21 @@ game_over_button_menu = image.load("sprites/button_menu.png")
 game_over_rect_exit = Rect(screen_width / 2 - 50, screen_height / 2 + 25, 100, 50)
 game_over_button_exit = image.load("sprites/button_exit.png")
 
+# Настройка всего в Login
+
+login_input_box = Rect(100, 100, 140, 50)
+
+login_input_active = False
+
+login_input_color = "red"
+
+text = ""
+
 direction = "stop"
 
 exit_game = False
 
-gamemode = "menu"
+gamemode = "login"
 
 fps = 144
 clock = time.Clock()
@@ -177,9 +187,48 @@ while not exit_game:
 
         canvas.blit(menu_bcg, (0, 0))
 
+        menu_greeting = font.render(f"Привет, {text}!", 1, WHITE)
+
+        canvas.blit(menu_greeting, (screen_width / 2 - 50, screen_height - 50))
+
         canvas.blit(button_start, rect_start)
         canvas.blit(button_skins, rect_skins)
         canvas.blit(button_exit, rect_exit)
+
+    # Авторизация
+
+    elif gamemode == "login":
+        for e in event.get():
+            if e.type == QUIT:
+                exit_game = True
+                if interval:
+                    clearInterval(interval)
+            elif e.type == MOUSEBUTTONDOWN:
+                if login_input_box.collidepoint(e.pos):
+                    login_input_active = True
+                    login_input_color = "green"
+                else:
+                    login_input_active = False
+                    login_input_color = "red"
+            elif e.type == KEYDOWN and login_input_active:
+                if e.key == K_RETURN:
+                    if text != "":
+                        gamemode = "menu"
+                elif e.key == K_BACKSPACE:
+                    text = text[:-1]
+                else:
+                    text += str(e.unicode)
+
+        canvas.fill(WHITE)
+
+        txt_surface = font.render(text, True, 'green')
+
+        width = max(login_input_box.width, txt_surface.get_width() + 10)
+        login_input_box.x = width
+
+        canvas.blit(txt_surface, (login_input_box.width + 5, login_input_box.y + 5))
+
+        draw.rect(canvas, login_input_color, login_input_box, 2)
 
     # Игра
 
