@@ -1,6 +1,7 @@
 import json
 import random
 
+import mysql.connector
 from protime import *
 from pygame import *
 
@@ -150,6 +151,22 @@ login_input_color = "red"
 
 text = ""
 
+userid = False
+
+# Настройка mysql
+
+dbconfig = {
+    "host": "127.0.0.1",
+    "user": "root",
+    "password": "t%bx*H5j|x3@$MM7t",
+    "database": "db",
+    "port": "7856"
+}
+
+conn = mysql.connector.connect(**dbconfig)
+
+cursor = conn.cursor()
+
 direction = "stop"
 
 exit_game = False
@@ -187,7 +204,7 @@ while not exit_game:
 
         canvas.blit(menu_bcg, (0, 0))
 
-        menu_greeting = font.render(f"Привет, {text}!", 1, WHITE)
+        menu_greeting = font.render(text, 1, WHITE)
 
         canvas.blit(menu_greeting, (screen_width / 2 - 50, screen_height - 50))
 
@@ -204,16 +221,28 @@ while not exit_game:
                 if interval:
                     clearInterval(interval)
             elif e.type == MOUSEBUTTONDOWN:
-                if login_input_box.collidepoint(e.pos):
-                    login_input_active = True
-                    login_input_color = "green"
-                else:
-                    login_input_active = False
-                    login_input_color = "red"
+                login_input_active = login_input_box.collidepoint(e.pos)
+                login_input_color = "green" if login_input_active else "red"
             elif e.type == KEYDOWN and login_input_active:
-                if e.key == K_RETURN:
-                    if text != "":
-                        gamemode = "menu"
+                if e.key == K_RETURN and text != "":
+                    cursor.execute("select id from users where name = (%s)", (text,))
+
+                    userid = cursor.fetchall()
+
+                    if len(userid) == 0:
+                        cursor.execute("insert users (name) values (%s)", (text,))
+
+                        conn.commit()
+
+                        cursor.execute("select id from users where name = (%s)", (text,))
+
+                        user_id = cursor.fetchall()
+
+                        text = f"Добро пожаловать, {text}!"
+                    else:
+                        text = f"С возвращением, {text}!"
+
+                    gamemode = "menu"
                 elif e.key == K_BACKSPACE:
                     text = text[:-1]
                 else:
