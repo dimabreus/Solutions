@@ -1,4 +1,3 @@
-import json
 import random
 
 import mysql.connector
@@ -151,16 +150,15 @@ login_input_color = "red"
 
 text = ""
 
-userid = False
+user_id = False
 
 # Настройка mysql
 
 dbconfig = {
-    "host": "127.0.0.1",
-    "user": "root",
-    "password": "t%bx*H5j|x3@$MM7t",
-    "database": "db",
-    "port": "7856"
+    "host": "db4free.net",
+    "user": "valeravalera",
+    "password": "123456789",
+    "database": "race_game_valera"
 }
 
 conn = mysql.connector.connect(**dbconfig)
@@ -225,22 +223,24 @@ while not exit_game:
                 login_input_color = "green" if login_input_active else "red"
             elif e.type == KEYDOWN and login_input_active:
                 if e.key == K_RETURN and text != "":
-                    cursor.execute("select id from users where name = (%s)", (text,))
+                    cursor.execute("select id from users1 where name = (%s)", (text,))
 
-                    userid = cursor.fetchall()
+                    user_id = cursor.fetchall()
 
-                    if len(userid) == 0:
-                        cursor.execute("insert users (name) values (%s)", (text,))
+                    if len(user_id) == 0:
+                        cursor.execute("insert users1 (name) values (%s)", (text,))
 
                         conn.commit()
 
-                        cursor.execute("select id from users where name = (%s)", (text,))
+                        cursor.execute("select id from users1 where name = (%s)", (text,))
 
                         user_id = cursor.fetchall()
 
                         text = f"Добро пожаловать, {text}!"
                     else:
                         text = f"С возвращением, {text}!"
+
+                    user_id = user_id[0][0]
 
                     gamemode = "menu"
                 elif e.key == K_BACKSPACE:
@@ -313,16 +313,19 @@ while not exit_game:
                 else:  # Событие смерти
                     clearInterval(interval)
 
-                    with open("total_scores.json", "r") as f:
-                        text = json.load(f)
+                    cursor.execute("select id, score from scores1 where user_id = (%s)", (user_id,))
 
-                    if len(text) < 5:
-                        text.append(score)
-                    else:
-                        text = text[-4:] + [score]
+                    res = cursor.fetchall()
 
-                    with open("total_scores.json", "w") as f:
-                        json.dump(text, f)
+                    if len(res) == 0:
+                        cursor.execute("insert scores1 (user_id, score) values(%s, %s)", (user_id, score))
+
+                        conn.commit()
+                    elif score > res[0][1]:
+                        cursor.execute("replace scores1 set id = %s, user_id = %s, score = %s;",
+                                       (res[0][0], user_id, score))
+
+                        conn.commit()
 
                     gamemode = "game over"
 
@@ -405,13 +408,36 @@ while not exit_game:
 
         finallyScoreLabel = font.render(f"Пройдено км: {score}", 1, BLACK)
         finallyBonusesLabel = font.render(f"Собрано бонусов: {bonuses}", 1, BLACK)
-        previousScoresLabel = font.render(
-            f"Предыдущие результаты: {', '.join(map(str, json.load(open('total_scores.json', 'r'))[::-1]))}.", 1, BLACK)
+
+        cursor.execute("SELECT user_id, score FROM scores1 ORDER BY score DESC LIMIT 5")
+
+        res = cursor.fetchall()
+
+        betterPlayers = []
+
+        # print(names)
+
+        for index, item in enumerate(res):
+            cursor.execute(f"select name from users1 where id = {res[index][0]}")
+
+            name = cursor.fetchall()
+            # print(item, index)
+            betterPlayers.append((name[0][0], item[1]))
+
+        # print(betterPlayers)
+
+        # print(res)
+        # cursor.execute("select name from ")
+
+        for i in range(5):
+            previousscores1Label = font.render(
+                f'{i + 1}. {betterPlayers[i][0]}: {betterPlayers[i][1]}', 1, BLACK)
+            canvas.blit(previousscores1Label, (screen_width / 2 + 100, i * 25))
+
         infoLabel = font.render(f"Что бы начать заново нажмите на пробел", 1, BLACK)
 
         canvas.blit(finallyScoreLabel, (screen_width / 2 - 150, 0))
         canvas.blit(finallyBonusesLabel, (screen_width / 2 - 150, 25))
-        canvas.blit(previousScoresLabel, (screen_width / 2 - 150, 50))
         canvas.blit(infoLabel, (screen_width / 2 - 150, screen_height - 50))
 
         canvas.blit(game_over_button_menu, game_over_rect_menu)
