@@ -1,6 +1,6 @@
 import random
 
-from protime import setInterval, clearInterval
+from chronoTrigger import set_interval, clear_interval
 from pygame import *
 
 init()
@@ -48,7 +48,7 @@ def score_plus():
     score += 1
 
 
-interval = setInterval(score_plus, 1)
+interval = set_interval(score_plus, 1)
 direction = "stop"
 
 while not exit_game:
@@ -56,7 +56,7 @@ while not exit_game:
     for e in event.get():
         if e.type == QUIT:
             exit_game = True
-            clearInterval(interval)
+            clear_interval(interval)
 
         if e.type == KEYDOWN:
             if e.key == K_w:
